@@ -1,0 +1,12 @@
+Bu Bash script, belirli bir OSD (Object Storage Device) numarasını ve PG (Placement Group) numarasını kullanarak Ceph depolama kümesindeki bir dizi işlemi otomatikleştirmektedir. İşlevselliği aşağıdaki gibidir:
+
+Kullanıcıdan OSD numarasını ve PG numarasını alır.
+OSD numarasına bağlı olan host bilgisini belirler.
+Belirlenen hosta SSH aracılığıyla bağlanarak OSD servisini durdurur.
+Ceph depolama alanından belirtilen PG'nin tüm verilerini siler.
+OSD servisini yeniden başlatır.
+Belirtilen PG'yi yeniden oluşturur.
+OSD servisini tekrar durdurur.
+Ceph depolama alanındaki PG'nin tamamlandığını işaretler.
+OSD servisini tekrar başlatır.
+Bu script, OSD numarası ve PG numarası girildiğinde, ilgili OSD'yi bulur, ilgili işlemleri gerçekleştirir ve belirli bir PG'nin veri bütünlüğünü sağlamak için kullanılabilir. Bu, Ceph depolama kümesindeki belirli sorunlara müdahale etmek için kullanılabilir. 
