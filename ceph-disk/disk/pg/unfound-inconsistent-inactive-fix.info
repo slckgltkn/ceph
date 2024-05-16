@@ -10,3 +10,36 @@ OSD servisini tekrar durdurur.
 Ceph depolama alanındaki PG'nin tamamlandığını işaretler.
 OSD servisini tekrar başlatır.
 Bu script, OSD numarası ve PG numarası girildiğinde, ilgili OSD'yi bulur, ilgili işlemleri gerçekleştirir ve belirli bir PG'nin veri bütünlüğünü sağlamak için kullanılabilir. Bu, Ceph depolama kümesindeki belirli sorunlara müdahale etmek için kullanılabilir. 
+
+
+Ceph Depolama Kümesinde Unfound Nesneleri Düzeltme Prosedürü
+
+Amaç: Ceph depolama kümesindeki unfound (bulunamayan) nesneleri belirleyerek ve düzelterek veri bütünlüğünü sağlamak.
+
+Kullanılan Ceph Sürümü: Nautilus 14.2.16
+
+Adımlar:
+
+Unfound Nesneleri Belirleme:
+- ceph health detail | grep unfound
+
+Unfound Nesnelerin Bulunduğu PG'nin Durumunu Kontrol Etme:
+- ceph pg <PG_ID> query | grep acting
+
+Unfound Nesnelerin Bulunduğu OSD'nin Hostunu Belirleme:
+- ceph osd crush tree | grep "osd\.1[^0-9]\|host" | grep -B 1 "osd\.1[^0-9]" | grep -v "osd\.1[^0-9]" | awk '{print $5}'
+
+OSD'ye SSH İle Bağlanma:
+- ssh $hostname
+
+Unfound nesneleri düzeltmek için aşağıdaki adımları izleyin:
+- ceph pg <PG_ID> mark_unfound_lost delete
+- systemctl stop ceph-osd@1
+- ceph-objectstore-tool --data-path /var/lib/ceph/osd/ceph-1/ --op remove --pgid 56.1e2s0 --force
+- systemctl start ceph-osd@1
+- ceph osd force-create-pg <PG_ID> --yes-i-really-mean-it
+- systemctl stop ceph-osd@1
+- ceph-objectstore-tool --data-path /var/lib/ceph/osd/ceph-1/ --op mark-complete --pgid 56.1e2s0
+- systemctl start ceph-osd@1
+
+
