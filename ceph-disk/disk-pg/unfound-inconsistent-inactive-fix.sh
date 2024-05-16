@@ -21,14 +21,14 @@ if [[ -n $osd && $osd =~ ^[0-9]+$ ]]; then
   # OSD numarasına sahip host'a SSH ile bağlan ve servis durumunu kontrol et
   if [[ -n $host ]]; then
     echo -e "OSD numarası ${GREEN}$osd${NC} olan cihazın bağlı olduğu host: ${GREEN}$host${NC}"
-    ssh "$host" "bdservice stop ceph-osd@$osd"
+    ssh "$host" "systemctl stop ceph-osd@$osd"
     ssh "$host" "ceph-objectstore-tool --data-path /var/lib/ceph/osd/ceph-$osd --op remove --pgid ${pgid}s0 --force"
-    ssh "$host" "bdservice start ceph-osd@$osd"
+    ssh "$host" "systemctl start ceph-osd@$osd"
     ssh "$host" "bhfs osd force-create-pg $pgid --yes-i-really-mean-it"
     sleep 60
-    ssh "$host" "bdservice stop ceph-osd@$osd"
+    ssh "$host" "systemctl stop ceph-osd@$osd"
     ssh "$host" "ceph-objectstore-tool --data-path /var/lib/ceph/osd/ceph-$osd --op mark-complete --pgid ${pgid}s0"
-    ssh "$host" "bdservice start ceph-osd@$osd"
+    ssh "$host" "systemctl start ceph-osd@$osd"
   else
     echo -e "${RED}OSD numarası $osd için uygun bir host bulunamadı.${NC}"
   fi
